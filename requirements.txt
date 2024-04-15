@@ -5,5 +5,5 @@ matplotlib
 plotly
 statsmodels
 pmdarima
-sklearn
+scikit-learn
 itertools
