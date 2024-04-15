@@ -6,4 +6,3 @@ plotly
 statsmodels
 pmdarima
 scikit-learn
-itertools

@@ -11,7 +11,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_percentage_error as mape
 import streamlit as st
 from helper_functions import lag, plot_bar, plot_line, plot_train_test, plot_predictions
-import itertools
 
 import warnings
 warnings.filterwarnings("ignore")
