@@ -25,7 +25,7 @@ def AR(url = None, variable = None, xparam = None, title = None):
                 label = "Lags",  
                 min_value = 0, 
                 max_value = len(true_df),   
-                value = len(true_df), 
+                value = len(true_df) - 10, 
                 key = "nlags_slider_key",      
                 step = 1,               
             )
@@ -55,8 +55,8 @@ def AR(url = None, variable = None, xparam = None, title = None):
     TRAIN_SIZE = st.slider(
                 label="Train Size",  
                 min_value = 0, 
-                max_value = len(true_df),  
-                value = len(true_df) - 20,  
+                max_value = len(true_df) - nlags,  
+                value = len(true_df) - nlags - 1,  
                 key="ar_slider_key",      
                 step = 1,               
             )
@@ -84,6 +84,83 @@ def AR(url = None, variable = None, xparam = None, title = None):
 
     error = mape(df[variable].iloc[pred_range], predictions)
     return error
+
+# def arima_implemented(url = None, xparam = None, variable = None, frcst_stp = None, title = None):
+#     true_df = pd.read_csv(url)
+#     df = true_df.copy()
+#     X = true_df[variable].values
+
+#     st.subheader("ARIMA Model")
+#     p = st.slider(
+#                 label="Choose p value",  
+#                 min_value = 0, 
+#                 max_value = 15,  
+#                 value = 2,  
+#                 key="arima_from_scratch_p_slider_key",      
+#                 step = 1,               
+#             )
+    
+#     q = st.slider(
+#                 label="Choose q value",  
+#                 min_value = 0, 
+#                 max_value = 15,  
+#                 value = 2,  
+#                 key="arima_from_scratch_q_slider_key",      
+#                 step = 1,               
+#             )
+    
+#     d = st.slider(
+#                 label="Choose d value",  
+#                 min_value = 0, 
+#                 max_value = 15,  
+#                 value = 2,  
+#                 key="arima_from_scratch_d_slider_key",      
+#                 step = 1,               
+#             )
+    
+#     arima_order = (p, d, q)
+
+#     TRAIN_SIZE = len(df[variable])
+    
+#     train, test = X[0: TRAIN_SIZE], X[TRAIN_SIZE: ]
+#     history = [x for x in train]
+   
+#     predictions = list()
+#     pred = arima_from_scratch(history, order = arima_order)
+#     st.write(pred)
+
+#     train_range = [i for i in range(1, len(train))]
+#     pred_range = train_range[len(train) - len(pred) - 1: ]
+
+#     # st.plotly_chart(plot_train_test(train, pred))
+#     st.plotly_chart(plot_predictions(x_train = train_range,\
+#                                     pred_range = pred_range,\
+#                                     y_train = train[1:],\
+#                                     predictions = pred,\
+#                                     title = "ARIMA results",\
+#                                     xlabel = xparam,\
+#                                     ylabel = variable
+#                                 ))
+
+#     error = mape(train[1:], pred[1:])
+#     return error
+
+# def arima_from_scratch(data, order=(1, 1, 1)):
+#   # Differencing (Integration)
+#   if order[1] > 0:
+#     differenced_data = [data[i] - data[i - order[1]] for i in range(order[1], len(data))]
+#   else:
+#     differenced_data = data
+
+#   # Autoregression
+#   p = order[0]
+#   predictions = [np.mean(data[: p])] * (p - 1)
+#   for i in range(order[0], len(differenced_data)):
+#     prediction = sum([differenced_data[i - j] for j in range(1, p + 1)])
+#     predictions.append(prediction)
+
+#   return predictions  # Get the last element (forecast)
+
 
 def evaluate_arima_model(url = None, xparam = None, variable = None, frcst_stp = None, title = None):
     true_df = pd.read_csv(url)

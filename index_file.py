@@ -18,7 +18,7 @@ from datasets import passengers_url, shampoo_url
 st.title("Evaluating Time Series Models Across Diverse Datasets")
 options_dict = {"Airplane Passengers Data": passengers_url, "Shampoo Data": shampoo_url}
 options = ["", "Airplane Passengers Data", "Shampoo Data"]
-selected_dataset = st.selectbox("Select a Time Series Model:", options)
+selected_dataset = st.selectbox("Select a Time Series dataset:", options)
 
 if selected_dataset == "Airplane Passengers Data":
     results = {}
@@ -29,6 +29,9 @@ if selected_dataset == "Airplane Passengers Data":
 
     results["ARIMA"] = evaluate_arima_model(url, variable = "#Passengers", xparam = "Months", title = "Passenger Data", frcst_stp = 16)
     st.write(results["ARIMA"])
+
+    # results["ARIMA_from_scratch"] = arima_implemented(url, variable = "#Passengers", xparam = "Months", title = "Passenger Data", frcst_stp = 16)
+    # st.write(results["ARIMA_from_scratch"])
 
     results["SARIMA"] = sarimax(url, variable = "#Passengers", xparam = "Months", title = "Passenger Data")
     st.write(results["SARIMA"])
