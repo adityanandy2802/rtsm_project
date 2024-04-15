@@ -85,81 +85,118 @@ def AR(url = None, variable = None, xparam = None, title = None):
     error = mape(df[variable].iloc[pred_range], predictions)
     return error
 
-# def arima_implemented(url = None, xparam = None, variable = None, frcst_stp = None, title = None):
-#     true_df = pd.read_csv(url)
-#     df = true_df.copy()
-#     X = true_df[variable].values
+def ARMA(url = None, variable = None, xparam = None, title = None):
+    true_df = pd.read_csv(url)
+    df = true_df.copy()
 
-#     st.subheader("ARIMA Model")
-#     p = st.slider(
-#                 label="Choose p value",  
-#                 min_value = 0, 
-#                 max_value = 15,  
-#                 value = 2,  
-#                 key="arima_from_scratch_p_slider_key",      
-#                 step = 1,               
-#             )
+    st.subheader("Autoregressive Moving Average (ARMA)")
+    window_size = st.slider(
+                label="Window Size",  
+                min_value = 0, 
+                max_value = 20,  
+                value = 10,  
+                key="arma_slider_key",      
+                step = 1,               
+            )
+    df['rolling_mean'] = df[variable].rolling(window = window_size).mean()
+    df.dropna(inplace = True)
+    st.plotly_chart(plot_predictions(x_train = [i for i in range(len(df[variable]))],\
+                                    x_test = [i for i in range(len(df[variable]))],\
+                                    y_train = df[variable],\
+                                    y_test = df["rolling_mean"],\
+                                    title = "Trendline",\
+                                    xlabel = xparam,\
+                                    ylabel = variable
+                                    ))
+    df["error"] = df[variable] - df["rolling_mean"]
+    st.plotly_chart(plot_line(x = [i for i in range(len(df["error"]))], y = df["error"], title = "Deviation from Rolling Mean", x_title = xparam, y_title = variable))
     
-#     q = st.slider(
-#                 label="Choose q value",  
-#                 min_value = 0, 
-#                 max_value = 15,  
-#                 value = 2,  
-#                 key="arima_from_scratch_q_slider_key",      
-#                 step = 1,               
-#             )
-    
-#     d = st.slider(
-#                 label="Choose d value",  
-#                 min_value = 0, 
-#                 max_value = 15,  
-#                 value = 2,  
-#                 key="arima_from_scratch_d_slider_key",      
-#                 step = 1,               
-#             )
-    
-#     arima_order = (p, d, q)
+    df_save = df
 
-#     TRAIN_SIZE = len(df[variable])
-    
-#     train, test = X[0: TRAIN_SIZE], X[TRAIN_SIZE: ]
-#     history = [x for x in train]
-   
-#     predictions = list()
-#     pred = arima_from_scratch(history, order = arima_order)
-#     st.write(pred)
+    nlags = st.slider(
+                label = "Lags",  
+                min_value = 0, 
+                max_value = len(df),   
+                value = 5, 
+                key = "nlags_arma_slider_key",      
+                step = 1,               
+            )
+    pacf_values = pacf(df["error"].values, nlags=20)[1:]
+    st.plotly_chart(plot_bar(x = [i for i in range(1, nlags + 1)],\
+                            y = pacf_values,\
+                            title = "PACF Values for Error Term",\
+                            x_title = xparam,\
+                            y_title = variable
+                    ))
+    lag_list = []
+    for i in range(len(pacf_values)):
+        if abs(pacf_values[i]) > 0.05:
+            lag_list.append(i + 1)
+    col_list, df_error = lag(df, "error", lag_list)
 
-#     train_range = [i for i in range(1, len(train))]
-#     pred_range = train_range[len(train) - len(pred) - 1: ]
+    df = df_save
+    pacf_values_trend = pacf(df["rolling_mean"].values, nlags = nlags)[1:]
+    st.plotly_chart(plot_bar(x = [i for i in range(1, nlags + 1)],\
+                            y = pacf_values_trend,\
+                            title = "PACF Values for Trend",\
+                            x_title = xparam,\
+                            y_title = variable
+                    ))
+    trend_lag_list = []
+    for i in range(len(pacf_values)):
+        if abs(pacf_values[i]) > 0.05:
+            trend_lag_list.append(i + 1)
+    trend_col_list, df_trend = lag(df, "rolling_mean", trend_lag_list)
 
-#     # st.plotly_chart(plot_train_test(train, pred))
-#     st.plotly_chart(plot_predictions(x_train = train_range,\
-#                                     pred_range = pred_range,\
-#                                     y_train = train[1:],\
-#                                     predictions = pred,\
-#                                     title = "ARIMA results",\
-#                                     xlabel = xparam,\
-#                                     ylabel = variable
-#                                 ))
+    df_error.dropna(inplace = True)
+    x = df_error[col_list]
+    y = df_error["error"]
 
-#     error = mape(train[1:], pred[1:])
-#     return error
+    df_trend.dropna(inplace = True)
+    trend_x = df_trend[trend_col_list]
+    trend_y = df_trend["rolling_mean"]
 
-# def arima_from_scratch(data, order=(1, 1, 1)):
-#   # Differencing (Integration)
-#   if order[1] > 0:
-#     differenced_data = [data[i] - data[i - order[1]] for i in range(order[1], len(data))]
-#   else:
-#     differenced_data = data
+    TRAIN_SIZE = st.slider(
+                label="Train Size",  
+                min_value = 0, 
+                max_value = len(true_df) - nlags,  
+                value = len(true_df) - nlags - 1,  
+                key="arma_train_slider_key",      
+                step = 1,               
+            )
+    x_train, y_train = x.iloc[: TRAIN_SIZE], y.iloc[: TRAIN_SIZE]
+    x_test, y_test = x.iloc[TRAIN_SIZE: ], y.iloc[TRAIN_SIZE: ]
 
-#   # Autoregression
-#   p = order[0]
-#   predictions = [np.mean(data[: p])] * (p - 1)
-#   for i in range(order[0], len(differenced_data)):
-#     prediction = sum([differenced_data[i - j] for j in range(1, p + 1)])
-#     predictions.append(prediction)
+    trend_x_train, trend_y_train = trend_x.iloc[: TRAIN_SIZE], trend_y.iloc[: TRAIN_SIZE]
+    trend_x_test, trend_y_test = trend_x.iloc[TRAIN_SIZE: ], trend_y.iloc[TRAIN_SIZE: ]
 
-#   return predictions  # Get the last element (forecast)
+    model_error = LinearRegression()
+    model_error.fit(x_train, y_train)
+    model_trend_line = LinearRegression()
+    model_trend_line.fit(trend_x_train, trend_y_train)
+
+    error_pred = model_error.predict(x_test)
+    trend_line_pred = model_trend_line.predict(trend_x_test)
+    trend_line_pred = trend_line_pred[-min(len(trend_line_pred), len(error_pred)): ]
+    error_pred = error_pred[-min(len(trend_line_pred), len(error_pred)): ]
+
+    prediction = trend_line_pred + error_pred
+
+    train_range = [i for i in range(TRAIN_SIZE)]
+    test_range = [i for i in range(TRAIN_SIZE, TRAIN_SIZE + len(y_test))]
+    pred_range = [i for i in range(TRAIN_SIZE + len(y_test) - min(len(trend_line_pred), len(error_pred)), TRAIN_SIZE + len(y_test))]
+    st.plotly_chart(plot_predictions(x_train = train_range,\
+                                    x_test = test_range,\
+                                    pred_range = pred_range,\
+                                    y_train = df[variable].iloc[train_range],\
+                                    y_test = df[variable].iloc[test_range],\
+                                    predictions = prediction,\
+                                    title = "ARMA Results",\
+                                    xlabel = xparam,\
+                                    ylabel = variable
+                        ))
+    error = mape(df[variable].iloc[pred_range], prediction)
+    return error
 
 
 def evaluate_arima_model(url = None, xparam = None, variable = None, frcst_stp = None, title = None):
