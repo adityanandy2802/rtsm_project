@@ -41,11 +41,12 @@ if selected_dataset == "Airplane Passengers Data":
 if selected_dataset == "Shampoo Data":
     results = {}
     url = options_dict[selected_dataset]
+    plot_chart(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
     results["AR"] = AR(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
     st.write(results["AR"])
 
-    results["ARMA"] = ARMA(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
-    st.write(results["ARMA"])
+    # results["ARMA"] = ARMA(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
+    # st.write(results["ARMA"])
 
     results["ARIMA"] = evaluate_arima_model(url, variable = "Sales of shampoo over a three year period", xparam = "Months", title = "Shampoo Data", frcst_stp = 1)
     st.write(results["ARIMA"])
@@ -58,6 +59,7 @@ if selected_dataset == "Shampoo Data":
 if selected_dataset == "Stock Market Data":
     results = {}
     url = options_dict[selected_dataset]
+    plot_chart(url, "Close Price", "Timestamp", "Stock Market Data")
     results["AR"] = AR(url, "Close Price", "TimeStamp", "Stock Market Data")
     st.write(results["AR"])
 
