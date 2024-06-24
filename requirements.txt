@@ -1,6 +1,6 @@
-streamlit
-pandas == 2.2.2
-numpy == 1.26.4
+streamlit == 1.22.0
+pandas == 1.5.2
+numpy == 1.23.4
 matplotlib
 plotly
 statsmodels
