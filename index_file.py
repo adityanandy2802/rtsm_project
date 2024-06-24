@@ -38,23 +38,23 @@ if selected_dataset == "Airplane Passengers Data":
 
     st.plotly_chart(plot_bar(x = list(results.keys()), y = list(results.values()), title = "Results", x_title = "Models", y_title = "MAPE", hline = False))
 
-if selected_dataset == "Shampoo Data":
-    results = {}
-    url = options_dict[selected_dataset]
-    plot_chart(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
-    results["AR"] = AR(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
-    st.write(results["AR"])
+# if selected_dataset == "Shampoo Data":
+#     results = {}
+#     url = options_dict[selected_dataset]
+#     plot_chart(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
+#     results["AR"] = AR(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
+#     st.write(results["AR"])
 
-    # results["ARMA"] = ARMA(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
-    # st.write(results["ARMA"])
+#     # results["ARMA"] = ARMA(url, "Sales of shampoo over a three year period", "Months", "Shampoo Data")
+#     # st.write(results["ARMA"])
 
-    results["ARIMA"] = evaluate_arima_model(url, variable = "Sales of shampoo over a three year period", xparam = "Months", title = "Shampoo Data", frcst_stp = 1)
-    st.write(results["ARIMA"])
+#     results["ARIMA"] = evaluate_arima_model(url, variable = "Sales of shampoo over a three year period", xparam = "Months", title = "Shampoo Data", frcst_stp = 1)
+#     st.write(results["ARIMA"])
 
-    results["SARIMA"] = sarimax(url, variable = "Sales of shampoo over a three year period", xparam = "Months", title = "Shampoo Data")
-    st.write(results["SARIMA"])
+#     results["SARIMA"] = sarimax(url, variable = "Sales of shampoo over a three year period", xparam = "Months", title = "Shampoo Data")
+#     st.write(results["SARIMA"])
 
-    st.plotly_chart(plot_bar(x = list(results.keys()), y = list(results.values()), title = "Results", x_title = "Models", y_title = "MAPE", hline = False))
+#     st.plotly_chart(plot_bar(x = list(results.keys()), y = list(results.values()), title = "Results", x_title = "Models", y_title = "MAPE", hline = False))
 
 if selected_dataset == "Stock Market Data":
     results = {}
